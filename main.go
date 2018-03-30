@@ -7,11 +7,8 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
-	"github.com/miekg/dns"
 	nsq "github.com/nsqio/go-nsq"
-	"jw4.us/nspub"
 )
 
 var (
@@ -55,15 +52,7 @@ type client struct {
 }
 
 func (c *client) HandleMessage(message *nsq.Message) error {
-	env := &nspub.Message{}
-	env.Unpack(message.Body)
-
-	msg := &dns.Msg{}
-	if err := msg.Unpack(env.Data); err != nil {
-		message.Requeue(30 * time.Second)
-		return err
-	}
-	fmt.Fprintf(os.Stderr, "%s\n", env.String())
 	message.Finish()
+	fmt.Printf("%s\n", message.Body)
 	return nil
 }
